@@ -1,4 +1,4 @@
-package digital.metro.pricing.calculator;
+package digital.metro.pricing.calculator.models;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -9,10 +9,10 @@ public class BasketCalculationResult {
     private Map<String, BigDecimal> pricedBasketEntries;
     private BigDecimal totalAmount;
 
-    private BasketCalculationResult() {
-    }
+    private BasketCalculationResult() {}
 
-    public BasketCalculationResult(String customerId, Map<String, BigDecimal> pricedBasketEntries, BigDecimal totalAmount) {
+    public BasketCalculationResult(final String customerId, final Map<String, BigDecimal> pricedBasketEntries,
+                                   final BigDecimal totalAmount) {
         this.customerId = customerId;
         this.pricedBasketEntries = pricedBasketEntries;
         this.totalAmount = totalAmount;
