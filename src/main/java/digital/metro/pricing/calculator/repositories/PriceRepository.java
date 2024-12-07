@@ -21,7 +21,7 @@ public class PriceRepository {
         this.prices = new HashMap<>();
         this.random = new Random();
     }
-
+    //de folosit optional in loc de null
     public BigDecimal getPriceByArticleId(final String articleId) {
         return prices.computeIfAbsent(articleId,
                 key -> BigDecimal.valueOf(0.5d + random.nextDouble() * 29.50d).setScale(2, RoundingMode.HALF_UP));

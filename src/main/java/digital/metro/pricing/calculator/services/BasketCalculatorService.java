@@ -1,5 +1,6 @@
 package digital.metro.pricing.calculator.services;
 
+import digital.metro.pricing.calculator.exceptions.PriceNotFoundException;
 import digital.metro.pricing.calculator.models.Basket;
 import digital.metro.pricing.calculator.models.BasketCalculationResult;
 import digital.metro.pricing.calculator.models.BasketEntry;
@@ -21,11 +22,11 @@ public class BasketCalculatorService {
         this.priceRepository = priceRepository;
     }
 
-    public BasketCalculationResult calculateBasket(final Basket basket) {
+    public BasketCalculationResult calculateBasketTotalPrice(final Basket basket) {
         Map<String, BigDecimal> pricedArticles = basket.getEntries().stream()
                 .collect(Collectors.toMap(
                         BasketEntry::getArticleId,
-                        entry -> calculateArticle(entry, basket.getCustomerId())
+                        entry -> getArticlePrice(entry.getArticleId(), basket.getCustomerId())
                                 .multiply(entry.getQuantity())));
 
         BigDecimal totalAmount = pricedArticles.values().stream()
@@ -34,21 +35,30 @@ public class BasketCalculatorService {
         return new BasketCalculationResult(basket.getCustomerId(), pricedArticles, totalAmount);
     }
 
-    public BigDecimal calculateArticle(final BasketEntry basketEntry, final String customerId) {
-        String articleId = basketEntry.getArticleId();
-        BigDecimal customerPrice = priceRepository.getPriceByArticleIdAndCustomerId(articleId, customerId);
-        if (customerPrice != null) {
-            return customerPrice;
+    private BigDecimal getArticlePrice(final String articleId, final String customerId) {
+        // logica trebuie rescrisa mai frumos folosind optinal
+        // de revizuit logica, sa permita customer id null
+        BigDecimal customPrice = priceRepository.getPriceByArticleIdAndCustomerId(articleId, customerId);
+        if (customPrice != null) {
+            return customPrice;
         }
-        return priceRepository.getPriceByArticleId(articleId);
+        return getArticleStandardPrice(articleId);
     }
 
     public BigDecimal getArticleStandardPrice(final String articleId) {
-        return priceRepository.getPriceByArticleId(articleId);
+        BigDecimal price = priceRepository.getPriceByArticleId(articleId);
+        if(price == null){
+            throw new PriceNotFoundException("Price not found for article " + articleId);
+        }
+        return price;
     }
 
     public BigDecimal getArticleCustomPriceForCustomer(final String articleId, final String customerId) {
-        return priceRepository.getPriceByArticleIdAndCustomerId(articleId, customerId);
+        BigDecimal customPrice = priceRepository.getPriceByArticleIdAndCustomerId(articleId, customerId);
+        if(customPrice == null){
+            throw new PriceNotFoundException("Price not found for the article " + articleId + " and the customer " + customerId);
+        }
+        return customPrice;
     }
     
 }

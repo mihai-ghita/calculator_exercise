@@ -11,7 +11,7 @@ public class BasketCalculationResult {
 
     private BasketCalculationResult() {
     }
-
+    //de pus final la toti paramentri campurilor
     public BasketCalculationResult(String customerId, Map<String, BigDecimal> pricedBasketEntries, BigDecimal totalAmount) {
         this.customerId = customerId;
         this.pricedBasketEntries = pricedBasketEntries;
