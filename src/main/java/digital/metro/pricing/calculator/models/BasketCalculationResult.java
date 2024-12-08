@@ -9,10 +9,10 @@ public class BasketCalculationResult {
     private Map<String, BigDecimal> pricedBasketEntries;
     private BigDecimal totalAmount;
 
-    private BasketCalculationResult() {
-    }
-    //de pus final la toti paramentri campurilor
-    public BasketCalculationResult(String customerId, Map<String, BigDecimal> pricedBasketEntries, BigDecimal totalAmount) {
+    private BasketCalculationResult() {}
+
+    public BasketCalculationResult(final String customerId, final Map<String, BigDecimal> pricedBasketEntries,
+                                   final BigDecimal totalAmount) {
         this.customerId = customerId;
         this.pricedBasketEntries = pricedBasketEntries;
         this.totalAmount = totalAmount;

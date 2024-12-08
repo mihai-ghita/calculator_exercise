@@ -26,8 +26,7 @@ public class BasketCalculatorService {
         Map<String, BigDecimal> pricedArticles = basket.getEntries().stream()
                 .collect(Collectors.toMap(
                         BasketEntry::getArticleId,
-                        entry -> getArticlePrice(entry.getArticleId(), basket.getCustomerId())
-                                .multiply(entry.getQuantity())));
+                        entry -> calculateArticlePrice(entry.getArticleId(), entry.getQuantity(), basket.getCustomerId())));
 
         BigDecimal totalAmount = pricedArticles.values().stream()
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -35,30 +34,22 @@ public class BasketCalculatorService {
         return new BasketCalculationResult(basket.getCustomerId(), pricedArticles, totalAmount);
     }
 
-    private BigDecimal getArticlePrice(final String articleId, final String customerId) {
-        // logica trebuie rescrisa mai frumos folosind optinal
-        // de revizuit logica, sa permita customer id null
-        BigDecimal customPrice = priceRepository.getPriceByArticleIdAndCustomerId(articleId, customerId);
-        if (customPrice != null) {
-            return customPrice;
-        }
-        return getArticleStandardPrice(articleId);
+    private BigDecimal calculateArticlePrice(final String articleId, final BigDecimal quantity,  final String customerId) {
+        return priceRepository.getPriceByArticleIdAndCustomerId(articleId, customerId)
+                .or(() -> priceRepository.getPriceByArticleId(articleId))
+                .map(price -> price.multiply(quantity))
+                .orElseThrow(() -> new PriceNotFoundException(String.format("Price not found for article %s", articleId)));
     }
 
     public BigDecimal getArticleStandardPrice(final String articleId) {
-        BigDecimal price = priceRepository.getPriceByArticleId(articleId);
-        if(price == null){
-            throw new PriceNotFoundException("Price not found for article " + articleId);
-        }
-        return price;
+        return priceRepository.getPriceByArticleId(articleId)
+                .orElseThrow(() -> new PriceNotFoundException(String.format("Price not found for article %s", articleId)));
     }
 
-    public BigDecimal getArticleCustomPriceForCustomer(final String articleId, final String customerId) {
-        BigDecimal customPrice = priceRepository.getPriceByArticleIdAndCustomerId(articleId, customerId);
-        if(customPrice == null){
-            throw new PriceNotFoundException("Price not found for the article " + articleId + " and the customer " + customerId);
-        }
-        return customPrice;
+    public BigDecimal getArticlePriceForCustomer(final String articleId, final String customerId) {
+        return priceRepository.getPriceByArticleIdAndCustomerId(articleId, customerId)
+                .or(() -> priceRepository.getPriceByArticleId(articleId))
+                .orElseThrow(() -> new PriceNotFoundException(String.format("Price not found for article %s", articleId)));
     }
     
 }

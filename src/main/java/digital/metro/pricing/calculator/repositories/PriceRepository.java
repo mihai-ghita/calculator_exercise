@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -14,6 +15,11 @@ import java.util.Random;
 @Component
 public class PriceRepository {
 
+    private static final BigDecimal CUSTOMER_ONE_PRICE_WEIGHT = new BigDecimal("0.90");
+    private static final BigDecimal CUSTOMER_TWO_PRICE_WEIGHT = new BigDecimal("0.90");
+    private static final String CUSTOMER_ONE = "customer-1";
+    private static final String CUSTOMER_TWO = "customer-2";
+
     private final Map<String, BigDecimal> prices;
     private final Random random;
 
@@ -21,20 +27,29 @@ public class PriceRepository {
         this.prices = new HashMap<>();
         this.random = new Random();
     }
-    //de folosit optional in loc de null
-    public BigDecimal getPriceByArticleId(final String articleId) {
-        return prices.computeIfAbsent(articleId,
-                key -> BigDecimal.valueOf(0.5d + random.nextDouble() * 29.50d).setScale(2, RoundingMode.HALF_UP));
+
+    public Optional<BigDecimal> getPriceByArticleId(final String articleId) {
+        double price = 0.5d + random.nextDouble() * 29.50d;
+        return Optional.of(
+                prices.computeIfAbsent(articleId, key ->
+                        BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP)
+                )
+        );
     }
 
-    public BigDecimal getPriceByArticleIdAndCustomerId(String articleId, String customerId) {
-        switch(customerId) {
-            case "customer-1":
-                return getPriceByArticleId(articleId).multiply(new BigDecimal("0.90")).setScale(2, RoundingMode.HALF_UP);
-            case "customer-2":
-                return getPriceByArticleId(articleId).multiply(new BigDecimal("0.85")).setScale(2, RoundingMode.HALF_UP);
+    public Optional<BigDecimal> getPriceByArticleIdAndCustomerId(final String articleId, final String customerId) {
+        switch (customerId) {
+            case CUSTOMER_ONE:
+                return getPriceByArticleId(articleId)
+                        .map(standardPrice -> standardPrice.multiply(CUSTOMER_ONE_PRICE_WEIGHT)
+                                .setScale(2, RoundingMode.HALF_UP)
+                        );
+            case CUSTOMER_TWO:
+                return getPriceByArticleId(articleId)
+                        .map(standardPrice -> standardPrice.multiply(CUSTOMER_TWO_PRICE_WEIGHT)
+                                .setScale(2, RoundingMode.HALF_UP)
+                        );
         }
-
-        return null;
+        return Optional.empty();
     }
 }

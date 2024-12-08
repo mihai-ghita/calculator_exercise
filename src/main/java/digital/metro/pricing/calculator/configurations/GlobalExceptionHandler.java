@@ -20,8 +20,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PriceNotFoundException.class)
     public ResponseEntity<ErrorModel> handlePriceNotFoundException(PriceNotFoundException ex, WebRequest request) {
-        ErrorModel errorModel = new ErrorModel(ex.getMessage());
-        return new ResponseEntity<>(errorModel, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ErrorModel(ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -30,7 +29,7 @@ public class GlobalExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
         ErrorModel errorModel = new ErrorModel(errors);
-        return new ResponseEntity<>(errorModel, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -39,9 +38,7 @@ public class GlobalExceptionHandler {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
         ErrorModel errorModel = new ErrorModel(errors);
-        return new ResponseEntity<>(errorModel, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
-
-
 
 }

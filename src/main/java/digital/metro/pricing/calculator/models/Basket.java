@@ -7,14 +7,14 @@ import java.util.Set;
 
 public class Basket {
 
-    @NotNull(message = "CustomerId is null.")
+    @NotNull(message = "CustomerId is null")
     private String customerId;
 
     @Valid
-    @NotNull(message = "The basked entries is null.")
+    @NotNull(message = "The basked entries is null")
     private Set<BasketEntry> entries;
 
-    public Basket(String customerId, Set<BasketEntry> entries) {
+    public Basket(final String customerId, final Set<BasketEntry> entries) {
         this.customerId = customerId;
         this.entries = entries;
     }

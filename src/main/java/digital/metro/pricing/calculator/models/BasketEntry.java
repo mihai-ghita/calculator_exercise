@@ -6,13 +6,13 @@ import java.math.BigDecimal;
 
 public class BasketEntry {
 
-    @NotBlank(message = "ArticleId is null or empty.")
+    @NotBlank(message = "ArticleId is null or empty")
     private String articleId;
 
-    @NotNull(message = "Quantity is null.")
+    @NotNull(message = "Quantity is null")
     private BigDecimal quantity;
 
-    public BasketEntry(String articleId, BigDecimal quantity) {
+    public BasketEntry(final String articleId, final BigDecimal quantity) {
         this.articleId = articleId;
         this.quantity = quantity;
     }

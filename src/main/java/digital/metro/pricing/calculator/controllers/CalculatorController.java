@@ -4,7 +4,6 @@ import digital.metro.pricing.calculator.models.Basket;
 import digital.metro.pricing.calculator.models.BasketCalculationResult;
 import digital.metro.pricing.calculator.services.BasketCalculatorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +38,7 @@ public class CalculatorController {
     public ResponseEntity<BigDecimal> getArticleCustomPriceForCustomer(
              @RequestParam @NotEmpty(message = "ArticleId is null or empty") String articleId,
              @RequestParam @NotEmpty(message = "CustomerId is null or empty") String customerId) {
-        return ResponseEntity.ok(basketCalculatorService.getArticleCustomPriceForCustomer(articleId, customerId));
+        return ResponseEntity.ok(basketCalculatorService.getArticlePriceForCustomer(articleId, customerId));
     }
+
 }
