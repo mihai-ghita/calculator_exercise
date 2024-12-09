@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.websocket.server.PathParam;
 import java.math.BigDecimal;
 
+
 @RestController
+@RequestMapping("/calculator")
 public class CalculatorResource {
 
     private BasketCalculatorService basketCalculatorService;
@@ -16,18 +18,19 @@ public class CalculatorResource {
         this.basketCalculatorService = basketCalculatorService;
     }
 
-    @PostMapping("/calculator/calculate-basket")
+    @PostMapping("/calculate-basket")
     public BasketCalculationResult calculateBasket(@RequestBody Basket basket) {
         return basketCalculatorService.calculateBasket(basket);
     }
 
-    @GetMapping("/calculator/article/{articleId}")
+    @GetMapping("/article/{articleId}")
     public BigDecimal getArticlePrice(@PathVariable String articleId) {
-        return basketCalculatorService.calculateArticle(new BasketEntry(articleId, BigDecimal.ONE), null);
+        return basketCalculatorService.getArticleStandardPrice(articleId);
     }
 
-    @GetMapping("/calculator/getarticlepriceforcustomer")
+    @GetMapping("/getarticlepriceforcustomer")
     public BigDecimal getArticlePriceForCustomer(@RequestParam String articleId, @RequestParam String customerId) {
-        return basketCalculatorService.calculateArticle(new BasketEntry(articleId, BigDecimal.ONE), customerId);
+        return basketCalculatorService.getArticlePriceForCustomer(articleId, customerId);
     }
+
 }

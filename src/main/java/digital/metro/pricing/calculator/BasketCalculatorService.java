@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 @Component
 public class BasketCalculatorService {
 
-    private PriceRepository priceRepository;
+    private final PriceRepository priceRepository;
 
     @Autowired
     public BasketCalculatorService(PriceRepository priceRepository) {
@@ -21,23 +21,34 @@ public class BasketCalculatorService {
         Map<String, BigDecimal> pricedArticles = basket.getEntries().stream()
                 .collect(Collectors.toMap(
                         BasketEntry::getArticleId,
-                        entry -> calculateArticle(entry, basket.getCustomerId())));
+                        entry -> calculateArticlePrice(entry.getArticleId(), basket.getCustomerId(),
+                                    entry.getQuantity())));
 
         BigDecimal totalAmount = pricedArticles.values().stream()
-                .reduce(BigDecimal.ONE, (a, b) -> a.add(b));
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new BasketCalculationResult(basket.getCustomerId(), pricedArticles, totalAmount);
     }
 
-    public BigDecimal calculateArticle(BasketEntry be, String customerId) {
-        String ArticleId = be.getArticleId();
-
-        if (customerId != null) {
-            BigDecimal customerPrice = priceRepository.getPriceByArticleIdAndCustomerId(ArticleId, customerId);
-            if (customerPrice != null) {
-                return customerPrice;
-            }
-        }
-        return priceRepository.getpricebyarticleId(ArticleId);
+    private BigDecimal calculateArticlePrice(final String articleId, final String customerId,
+                                             final BigDecimal quantity) {
+        return getArticlePriceForCustomer(articleId, customerId).multiply(quantity);
     }
+
+    public BigDecimal getArticleStandardPrice(final String articleId) {
+        BigDecimal price = priceRepository.getPriceByArticleId(articleId);
+        if(price == null){
+            throw new PriceNotFoundException(String.format("Price not found for article %s", articleId));
+        }
+        return price;
+    }
+
+    public BigDecimal getArticlePriceForCustomer(final String articleId, final String customerId) {
+        BigDecimal customPrice = priceRepository.getPriceByArticleIdAndCustomerId(articleId, customerId);
+        if(customPrice == null){
+            return getArticleStandardPrice(articleId);
+        }
+        return customPrice;
+    }
+
 }
