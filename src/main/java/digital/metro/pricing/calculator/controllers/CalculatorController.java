@@ -35,7 +35,7 @@ public class CalculatorController {
     }
 
     @GetMapping("/getarticlepriceforcustomer")
-    public ResponseEntity<BigDecimal> getArticleCustomPriceForCustomer(
+    public ResponseEntity<BigDecimal> getArticlePriceForCustomer(
              @RequestParam @NotEmpty(message = "ArticleId is null or empty") String articleId,
              @RequestParam @NotEmpty(message = "CustomerId is null or empty") String customerId) {
         return ResponseEntity.ok(basketCalculatorService.getArticlePriceForCustomer(articleId, customerId));

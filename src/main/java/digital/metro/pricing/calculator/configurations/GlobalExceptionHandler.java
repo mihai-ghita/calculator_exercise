@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorModel> handleUserNotFoundException(MethodArgumentNotValidException ex, WebRequest request) {
+    public ResponseEntity<ErrorModel> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
         List<String> errors = ex.getFieldErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorModel> handleUserNotFoundException(ConstraintViolationException ex, WebRequest request) {
+    public ResponseEntity<ErrorModel> handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
         List<String> errors = ex.getConstraintViolations().stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
