@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -25,20 +26,20 @@ public class CalculatorController {
     }
 
     @PostMapping("/calculate-basket")
-    public ResponseEntity<BasketCalculationResult> calculateBasket(@Valid @RequestBody Basket basket) {
-        return ResponseEntity.ok(basketCalculatorService.calculateBasketTotalPrice(basket));
+    public Mono<ResponseEntity<BasketCalculationResult>> calculateBasket(@Valid @RequestBody Basket basket) {
+        return basketCalculatorService.calculateBasketTotalPrice(basket).map(ResponseEntity::ok);
     }
 
     @GetMapping(value = "/article/{articleId}")
-    public ResponseEntity<BigDecimal> getArticleDefaultPrice(@PathVariable String articleId) {
-        return ResponseEntity.ok(basketCalculatorService.getArticleStandardPrice(articleId));
+    public Mono<ResponseEntity<BigDecimal>> getArticleDefaultPrice(@PathVariable String articleId) {
+        return basketCalculatorService.getArticleStandardPrice(articleId).map(ResponseEntity::ok);
     }
 
     @GetMapping("/getarticlepriceforcustomer")
-    public ResponseEntity<BigDecimal> getArticleCustomPriceForCustomer(
+    public Mono<ResponseEntity<BigDecimal>> getArticleCustomPriceForCustomer(
              @RequestParam @NotEmpty(message = "ArticleId is null or empty") String articleId,
              @RequestParam @NotEmpty(message = "CustomerId is null or empty") String customerId) {
-        return ResponseEntity.ok(basketCalculatorService.getArticlePriceForCustomer(articleId, customerId));
+        return basketCalculatorService.getArticlePriceForCustomer(articleId, customerId).map(ResponseEntity::ok);
     }
 
 }

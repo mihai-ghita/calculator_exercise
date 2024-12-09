@@ -1,6 +1,7 @@
 package digital.metro.pricing.calculator.repositories;
 
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -28,16 +29,16 @@ public class PriceRepository {
         this.random = new Random();
     }
 
-    public Optional<BigDecimal> getPriceByArticleId(final String articleId) {
+    public Mono<BigDecimal> getPriceByArticleId(final String articleId) {
         double price = 0.5d + random.nextDouble() * 29.50d;
-        return Optional.of(
-                prices.computeIfAbsent(articleId, key ->
-                        BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP)
-                )
+        return Mono.fromSupplier(() ->
+                        prices.computeIfAbsent(articleId, key ->
+                                BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP)
+                        )
         );
     }
 
-    public Optional<BigDecimal> getPriceByArticleIdAndCustomerId(final String articleId, final String customerId) {
+    public Mono<BigDecimal> getPriceByArticleIdAndCustomerId(final String articleId, final String customerId) {
         switch (customerId) {
             case CUSTOMER_ONE:
                 return getPriceByArticleId(articleId)
@@ -50,6 +51,6 @@ public class PriceRepository {
                                 .setScale(2, RoundingMode.HALF_UP)
                         );
         }
-        return Optional.empty();
+        return Mono.empty();
     }
 }
